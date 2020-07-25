@@ -18,6 +18,8 @@
 
 ## blendish python ripped from fro io_import_dxf
 
+
+##Orginaly developed By lee Butler.Later Modified By sama-e-shan. (github.com/samaeen)
 import string
 import os
 import bpy
@@ -35,7 +37,7 @@ relMode = 0
 
 bl_info = {
     'name': 'Import GCode',
-    'author': 'Lee Butler',
+    'author': 'Shoummo',
     'version': (0,1,0),
     'blender': (2, 80, 0),
     'location': 'File > Import-Export > Gcode',
@@ -170,8 +172,8 @@ class IMPORT_OT_gcode(bpy.types.Operator):
         bpy.context.view_layer.active_layer_collection.collection.objects.link(profileObject)
 
         bpy.context.view_layer.objects.active = profileObject
-        scn.frame_end = len(self.layers)
-        scn.frame_set(0)
+        bpy.context.scene.frame_end = len(self.layers)
+        bpy.context.scene.frame_set(0)
 
         for layerNum,layer in enumerate(self.layers):
 
@@ -179,7 +181,7 @@ class IMPORT_OT_gcode(bpy.types.Operator):
             curveData = bpy.data.curves.new(layerName, type='CURVE')
             curveData.dimensions = '3D'
             curveData.bevel_object = profileObject
-            #print (layerName + ':')
+            print (layerName + ':')
 
             for poly in layer:
                 pointNum = 0
@@ -198,20 +200,22 @@ class IMPORT_OT_gcode(bpy.types.Operator):
                         polyline.points[1].co = newPt
                         oldPt = newPt
             layerObject = bpy.data.objects.new(layerName, curveData)
-            scn.objects.link(layerObject)
-            scn.objects.active = layerObject
+            bpy.context.view_layer.active_layer_collection.collection.objects.link(layerObject)
+            bpy.context.view_layer.objects.active = layerObject
             #hide layers and set keyframes
-            layerObject.hide = True
+            layerObject.hide_get()
+            layerObject.hide_set(True)
             layerObject.hide_render = True
-            layerObject.keyframe_insert("hide")
-            layerObject.keyframe_insert("hide_render")
+            #layerObject.keyframe_insert("hide")
+            #layerObject.keyframe_insert("hide_render")
             # and make them reappear
-            scn.frame_set(layerNum)
+            bpy.context.scene.frame_set(layerNum)
             print('Processing frame '+str(layerName))
-            layerObject.hide = False
+            layerObject.hide_get()
+            layerObject.hide_set(False)
             layerObject.hide_render = False
-            layerObject.keyframe_insert("hide")
-            layerObject.keyframe_insert("hide_render")
+            #layerObject.keyframe_insert("hide")
+            #layerObject.keyframe_insert("hide_render")
 
         # print('-------------- done -------------')
 
